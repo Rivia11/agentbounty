@@ -1,0 +1,164 @@
+{
+  "$schema": "https://a2a-protocol.org/schemas/agent-card.json",
+  "name": "Agent Bounty",
+  "description": "Autonomous AI freelancer accepting crypto bounties via x402. Research, websites, writing, and code.",
+  "version": "1.0.0",
+  "url": "https://agentbounty.ai",
+
+  "capabilities": [
+    {
+      "name": "research",
+      "description": "Deep research on any topic with sources and analysis",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": { "type": "string", "description": "The research topic or question" },
+          "depth": {
+            "type": "string",
+            "enum": ["quick", "standard", "comprehensive"],
+            "default": "standard"
+          },
+          "sources": { "type": "number", "default": 10, "maximum": 25 }
+        },
+        "required": ["topic"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "summary": { "type": "string" },
+          "findings": { "type": "array", "items": { "type": "string" } },
+          "sources": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "pricing": {
+        "currency": "USDC",
+        "network": "base",
+        "base": "5.00",
+        "perSource": "0.50"
+      }
+    },
+    {
+      "name": "website-creation",
+      "description": "Build and deploy modern landing pages to Vercel",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "style": {
+            "type": "string",
+            "enum": ["modern", "minimal", "bold", "corporate"],
+            "default": "modern"
+          },
+          "sections": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["hero", "features", "cta"]
+          }
+        },
+        "required": ["description"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "url": { "type": "string", "format": "uri" },
+          "code": { "type": "string" }
+        }
+      },
+      "pricing": {
+        "currency": "USDC",
+        "network": "base",
+        "base": "25.00"
+      }
+    },
+    {
+      "name": "content-writing",
+      "description": "Create blog posts, tweet threads, documentation",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["blog", "thread", "documentation", "copy"],
+            "default": "blog"
+          },
+          "tone": {
+            "type": "string",
+            "enum": ["professional", "casual", "technical"],
+            "default": "professional"
+          },
+          "wordCount": { "type": "number", "default": 500 }
+        },
+        "required": ["topic"]
+      },
+      "pricing": {
+        "currency": "USDC",
+        "network": "base",
+        "base": "5.00",
+        "perWord": "0.005"
+      }
+    },
+    {
+      "name": "code-generation",
+      "description": "Generate, review, debug, or explain code",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "request": { "type": "string" },
+          "action": {
+            "type": "string",
+            "enum": ["generate", "review", "debug", "explain"],
+            "default": "generate"
+          },
+          "language": { "type": "string" }
+        },
+        "required": ["request"]
+      },
+      "pricing": {
+        "currency": "USDC",
+        "network": "base",
+        "base": "10.00"
+      }
+    }
+  ],
+
+  "payment": {
+    "protocol": "x402",
+    "version": "1.0",
+    "networks": [
+      {
+        "name": "base",
+        "chainId": 8453,
+        "currency": "USDC",
+        "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      }
+    ],
+    "wallet": "0x0000000000000000000000000000000000000000"
+  },
+
+  "communication": {
+    "a2a": {
+      "version": "0.3",
+      "endpoint": "https://agentbounty.ai/a2a",
+      "supports": ["task_request", "learning_share", "capability_query"]
+    },
+    "channels": [
+      { "type": "twitter", "handle": "@AgentBountyBot" },
+      { "type": "telegram", "handle": "@AgentBountyBot" },
+      { "type": "web", "url": "https://agentbounty.ai" }
+    ]
+  },
+
+  "reputation": {
+    "tasksCompleted": 0,
+    "successRate": 0,
+    "avgRating": 0,
+    "registeredAt": "2026-01-31T00:00:00Z"
+  },
+
+  "metadata": {
+    "aiModel": "claude-sonnet",
+    "framework": "custom",
+    "sourceCode": "https://github.com/your-org/agent-bounty"
+  }
+}

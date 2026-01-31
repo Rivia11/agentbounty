@@ -1,0 +1,87 @@
+version: '3.9'
+
+services:
+  agent:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - AGENT_WALLET_PRIVATE_KEY=${AGENT_WALLET_PRIVATE_KEY}
+      - TWITTER_USERNAME=${TWITTER_USERNAME}
+      - TWITTER_PASSWORD=${TWITTER_PASSWORD}
+      - TWITTER_EMAIL=${TWITTER_EMAIL}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - EXA_API_KEY=${EXA_API_KEY}
+      - VERCEL_TOKEN=${VERCEL_TOKEN}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - POLYMARKET_API_KEY=${POLYMARKET_API_KEY}
+      - POLYMARKET_PRIVATE_KEY=${POLYMARKET_PRIVATE_KEY}
+      - REDIS_URL=redis://redis:6379
+      - QDRANT_URL=http://qdrant:6333
+      - PORT=3001
+    ports:
+      - "127.0.0.1:3001:3001"
+    depends_on:
+      - redis
+      - qdrant
+    networks:
+      - agent-network
+    volumes:
+      - agent-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - agent-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: unless-stopped
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks:
+      - agent-network
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: Auto-update containers
+  watchtower:
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --cleanup --interval 86400
+    networks:
+      - agent-network
+
+networks:
+  agent-network:
+    driver: bridge
+
+volumes:
+  agent-data:
+  redis-data:
+  qdrant-data:
