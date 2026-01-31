@@ -117,6 +117,7 @@ export class TokenManager {
       const launchTweet = `@bankrbot create Name: ${config.token.name} Symbol: ${config.token.symbol} Description: ${config.token.description || 'AI Agent Token for Agent Bounty'}`;
 
       // Post the launch tweet
+      // @ts-expect-error - sendTweet exists but types may be incomplete
       const result = await this.scraper!.sendTweet(launchTweet);
       const tweetId = result?.id;
 

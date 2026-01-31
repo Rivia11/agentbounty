@@ -9,6 +9,7 @@ import { TaskQueue } from './queue/task-queue.js';
 import { MemoryStore } from './memory/store.js';
 import { A2AClient } from './a2a/client.js';
 import { SkillRegistry } from './skills/registry.js';
+import { getMoltbookSkill } from './skills/moltbook.js';
 import { config } from './config.js';
 import { logger } from './utils/logger.js';
 
@@ -34,7 +35,15 @@ async function main() {
   // Initialize A2A client for agent-to-agent communication
   const a2a = new A2AClient({
     agentId: config.agent.id,
-    agentCard: config.agent.card,
+    agentCard: {
+      ...config.agent.card,
+      capabilities: [...config.agent.card.capabilities],
+      payment: {
+        ...config.agent.card.payment,
+        networks: [...config.agent.card.payment.networks],
+        currencies: [...config.agent.card.payment.currencies]
+      }
+    },
     endpoint: config.a2a.endpoint
   });
   logger.info('✅ A2A client initialized');
@@ -43,6 +52,14 @@ async function main() {
   const skills = new SkillRegistry();
   await skills.loadSkills();
   logger.info(`✅ Loaded ${skills.count()} skills`);
+
+  // Initialize Moltbook (social network for AI agents)
+  const moltbook = await getMoltbookSkill();
+  if (moltbook.isRegistered()) {
+    logger.info(`✅ Moltbook connected ${moltbook.isVerified() ? '(verified)' : '(pending verification)'}`);
+  } else {
+    logger.info('ℹ️ Moltbook not registered - run registration when ready');
+  }
 
   // Initialize agent core
   const agent = new AgentCore({
@@ -55,7 +72,7 @@ async function main() {
   });
 
   // Initialize channels
-  const channels = [];
+  const channels: Array<{ disconnect?: () => Promise<void> }> = [];
 
   if (config.twitter.enabled) {
     const twitter = new TwitterChannel(agent, {

@@ -68,26 +68,26 @@ export interface PaymentVerification {
 }
 
 export class X402PaymentHandler {
-  private publicClient: PublicClient;
-  private walletClient: WalletClient;
+  private publicClient;
+  private walletClient;
   private account: ReturnType<typeof privateKeyToAccount>;
   private network: 'base' | 'base-sepolia';
+  private chain: typeof base | typeof baseSepolia;
   private usdcAddress: `0x${string}`;
 
   constructor(privateKey: `0x${string}`, network: 'base' | 'base-sepolia' = 'base') {
     this.network = network;
     this.account = privateKeyToAccount(privateKey);
-
-    const chain = network === 'base' ? base : baseSepolia;
+    this.chain = network === 'base' ? base : baseSepolia;
 
     this.publicClient = createPublicClient({
-      chain,
+      chain: this.chain,
       transport: http()
     });
 
     this.walletClient = createWalletClient({
       account: this.account,
-      chain,
+      chain: this.chain,
       transport: http()
     });
 
@@ -267,7 +267,8 @@ export class X402PaymentHandler {
         address: this.usdcAddress,
         abi: USDC_ABI,
         functionName: 'transfer',
-        args: [to, amountWei]
+        args: [to, amountWei],
+        chain: this.chain
       });
 
       // Wait for confirmation

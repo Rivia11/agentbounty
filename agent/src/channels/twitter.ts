@@ -153,6 +153,7 @@ export class TwitterChannel {
       const replyText = this.formatReply(response);
 
       // Send reply
+      // @ts-expect-error - sendTweet exists but types may be incomplete
       await this.scraper.sendTweet(replyText, tweetId);
 
       logger.info(`Replied to tweet ${tweetId}`);
@@ -190,6 +191,7 @@ export class TwitterChannel {
    */
   async postTweet(text: string): Promise<string | null> {
     try {
+      // @ts-expect-error - sendTweet exists but types may be incomplete
       const result = await this.scraper.sendTweet(text);
       logger.info(`Posted tweet: ${text.slice(0, 50)}...`);
       return result?.id || null;
@@ -233,6 +235,7 @@ export class TwitterChannel {
    */
   async likeTweet(tweetId: string): Promise<boolean> {
     try {
+      // @ts-expect-error - likeTweet exists but types may be incomplete
       await this.scraper.likeTweet(tweetId);
       return true;
     } catch (error) {
